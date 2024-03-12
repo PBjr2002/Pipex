@@ -6,7 +6,7 @@
 /*   By: pauberna <pauberna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 13:02:09 by pauberna          #+#    #+#             */
-/*   Updated: 2024/03/12 11:40:55 by pauberna         ###   ########.fr       */
+/*   Updated: 2024/03/12 12:28:30 by pauberna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,14 +32,17 @@ void	execute_fork(t_cmd *cmd, char **envp)
 	n = 0;
 	while (++n <= cmd[0].cmd_nb)
 	{
-		cmd[n].id = fork();
-		if (cmd[n].id == -1)
-			fancy_exit(cmd);
-		if (cmd[n].id == 0)
+		if (cmd[n].path)
 		{
-			if (access(cmd[n].path, X_OK) == 0)
-				execute_cmd(cmd, envp, n);
-			break ;
+			cmd[n].id = fork();
+			if (cmd[n].id == -1)
+				fancy_exit(cmd);
+			if (cmd[n].id == 0)
+			{
+				if (access(cmd[n].path, X_OK) == 0)
+					execute_cmd(cmd, envp, n);
+				break ;
+			}
 		}
 	}
 	close_fd(cmd, cmd[0].cmd_nb);

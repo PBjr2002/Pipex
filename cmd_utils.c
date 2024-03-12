@@ -6,7 +6,7 @@
 /*   By: pauberna <pauberna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 12:51:18 by pauberna          #+#    #+#             */
-/*   Updated: 2024/03/12 11:15:55 by pauberna         ###   ########.fr       */
+/*   Updated: 2024/03/12 12:25:46 by pauberna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,6 @@ t_cmd	*cmd_creator(int ac, char **av, char **envp)
 	cmd_initializer(cmd, ac);
 	i = 1;
 	paths = path_creator(envp);
-	if (!paths)
-		fancy_exit(cmd);
 	while (i < ac - 2)
 	{
 		cmd[i].cmd = ft_split(av[i + 1], ' ');

@@ -6,7 +6,7 @@
 /*   By: pauberna <pauberna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 10:15:38 by pauberna          #+#    #+#             */
-/*   Updated: 2024/03/12 10:30:22 by pauberna         ###   ########.fr       */
+/*   Updated: 2024/03/12 12:22:49 by pauberna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ char	**path_creator(char **envp)
 
 	path = NULL;
 	index = 0;
-	while (envp[index])
+	while (envp && envp[index])
 	{
 		if (ft_strncmp(envp[index], "PATH=", 5) == 0)
 		{
@@ -42,7 +42,7 @@ void	free_paths(char **paths)
 	int	i;
 
 	i = 0;
-	while (paths[i])
+	while (paths && paths[i])
 	{
 		if (i == 0)
 			free(paths[i] - 5);
@@ -50,7 +50,8 @@ void	free_paths(char **paths)
 			free(paths[i]);
 		i++;
 	}
-	free(paths);
+	if (paths)
+		free(paths);
 }
 
 void	path_checker(t_cmd *cmd, char **paths)
@@ -71,11 +72,11 @@ void	path_checker(t_cmd *cmd, char **paths)
 				free(cmd[n].path);
 			i++;
 		}
-		if (!paths[i])
+		if (!paths || !paths[i])
 		{
 			cmd[n].path = NULL;
-			free_paths(paths);
-			fancy_exit(cmd);
+			ft_putstr_fd(cmd[n].cmd[0], 2);
+			ft_putstr_fd(" : command not found\n", 2);
 		}
 		n++;
 	}
