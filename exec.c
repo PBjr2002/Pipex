@@ -6,7 +6,7 @@
 /*   By: pauberna <pauberna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 13:02:09 by pauberna          #+#    #+#             */
-/*   Updated: 2024/03/12 11:14:19 by pauberna         ###   ########.fr       */
+/*   Updated: 2024/03/12 11:40:55 by pauberna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,14 +66,14 @@ void	open_pipe(t_cmd *cmd, char **av, int ac)
 
 void	execute_cmd(t_cmd *cmd, char **envp, int n)
 {
-	if(dup2(cmd[n - 1].fd[0], STDIN_FILENO) == -1)
+	if (dup2(cmd[n - 1].fd[0], STDIN_FILENO) == -1)
 	{
 		close_fd(cmd, cmd[0].cmd_nb);
 		fancy_exit(cmd);
 	}
 	if (n == cmd[0].cmd_nb)
 	{
-		if(dup2(cmd[0].fd[1], STDOUT_FILENO) == -1)
+		if (dup2(cmd[0].fd[1], STDOUT_FILENO) == -1)
 		{
 			close_fd(cmd, cmd[0].cmd_nb);
 			fancy_exit(cmd);
@@ -81,11 +81,11 @@ void	execute_cmd(t_cmd *cmd, char **envp, int n)
 	}
 	else
 	{
-		if(dup2(cmd[n].fd[1], STDOUT_FILENO) == -1)
+		if (dup2(cmd[n].fd[1], STDOUT_FILENO) == -1)
 		{
 			close_fd(cmd, cmd[0].cmd_nb);
 			fancy_exit(cmd);
-		}	
+		}
 	}
 	close_fd(cmd, cmd[0].cmd_nb);
 	if (execve(cmd[n].path, cmd[n].cmd, envp) == -1)
