@@ -6,11 +6,18 @@
 /*   By: pauberna <pauberna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/27 12:52:14 by pauberna          #+#    #+#             */
-/*   Updated: 2024/03/12 12:29:48 by pauberna         ###   ########.fr       */
+/*   Updated: 2024/03/13 14:53:36 by pauberna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
+
+int	here_doc_checker(char **av)
+{
+	if (ft_strcmp(av[1], "here_doc") == 0)
+		return (0);
+	return (-1);
+}
 
 void	fancy_exit(t_cmd *cmd)
 {

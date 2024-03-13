@@ -6,11 +6,35 @@
 /*   By: pauberna <pauberna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 13:02:09 by pauberna          #+#    #+#             */
-/*   Updated: 2024/03/12 12:28:30 by pauberna         ###   ########.fr       */
+/*   Updated: 2024/03/13 14:49:25 by pauberna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
+
+int	exe_here_doc(t_cmd *cmd)
+{
+	char	*str;
+	int		fd[2];
+
+	if (pipe(fd) == -1)
+		fancy_exit(cmd);
+	while (1)
+	{
+		str = get_next_line(STDIN_FILENO);
+		if (!str)
+			fancy_exit(cmd);
+		if (ft_strncmp(str, cmd[0].limiter, ft_strlen(str) - 1) == 0
+			&& (ft_strlen(str) - 1) == ft_strlen(cmd[0].limiter))
+			break ;
+		ft_putstr_fd(str, fd[1]);
+		free(str);
+	}
+	free(str);
+	close(fd[1]);
+	free(cmd[0].limiter);
+	return (fd[0]);
+}
 
 void	close_fd(t_cmd *cmd, int limit)
 {
@@ -52,12 +76,22 @@ void	open_pipe(t_cmd *cmd, char **av, int ac)
 {
 	int	n;
 
-	cmd[0].fd[0] = open(av[1], O_RDONLY);
-	if (cmd[0].fd[0] == -1)
-		error_msg(cmd, 0);
-	cmd[0].fd[1] = open(av[ac - 1], O_CREAT | O_WRONLY | O_TRUNC, 0644);
-	if (cmd[0].fd[1] == -1)
-		error_msg(cmd, 1);
+	if (here_doc_checker(av) == 0)
+	{
+		cmd[0].fd[0] = exe_here_doc(cmd);
+		cmd[0].fd[1] = open(av[ac - 1], O_CREAT | O_WRONLY | O_APPEND, 0644);
+		if (cmd[0].fd[1] == -1)
+			error_msg(cmd, 1);
+	}
+	else
+	{
+		cmd[0].fd[0] = open(av[1], O_RDONLY);
+		if (cmd[0].fd[0] == -1)
+			error_msg(cmd, 0);
+		cmd[0].fd[1] = open(av[ac - 1], O_CREAT | O_WRONLY | O_TRUNC, 0644);
+		if (cmd[0].fd[1] == -1)
+			error_msg(cmd, 1);
+	}
 	n = 1;
 	while (n < cmd[0].cmd_nb)
 	{
