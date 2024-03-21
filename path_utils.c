@@ -6,7 +6,7 @@
 /*   By: pauberna <pauberna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 10:15:38 by pauberna          #+#    #+#             */
-/*   Updated: 2024/03/13 10:12:40 by pauberna         ###   ########.fr       */
+/*   Updated: 2024/03/21 14:52:00 by pauberna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 char	**path_creator(char **envp)
 {
 	char	**path;
-	int		i;
 	int		index;
 
 	path = NULL;
@@ -24,7 +23,6 @@ char	**path_creator(char **envp)
 	{
 		if (ft_strncmp(envp[index], "PATH=", 5) == 0)
 		{
-			i = 0;
 			path = ft_split(envp[index], ':');
 			if (!path)
 				free_paths(path);
@@ -58,27 +56,27 @@ void	path_checker(t_cmd *cmd, char **paths)
 {
 	int	i;
 	int	n;
+	int	check;
 
-	n = 1;
-	while (n <= cmd[0].cmd_nb)
+	n = 0;
+	while (++n <= cmd[0].cmd_nb)
 	{
-		i = 0;
-		while (paths && paths[i])
+		i = -1;
+		check = 0;
+		while (paths && paths[++i])
 		{
 			path_creator2(cmd, paths, n, i);
-			if (access(cmd[n].path, X_OK) == 0)
-				break ;
-			else
-				free(cmd[n].path);
-			i++;
+			if (cmd[n].path)
+			{
+				check = access(cmd[n].path, X_OK);
+				if (check == 0)
+					break ;
+				else
+					free(cmd[n].path);
+			}
 		}
-		if (!paths || !paths[i])
-		{
+		if ((!paths || !paths[i]) && check != 0)
 			cmd[n].path = NULL;
-			ft_putstr_fd(cmd[n].cmd[0], 2);
-			ft_putstr_fd(" : command not found\n", 2);
-		}
-		n++;
 	}
 	free_paths(paths);
 }
@@ -93,9 +91,11 @@ void	path_creator2(t_cmd *cmd, char **path, int n, int i)
 		free_paths(path);
 		fancy_exit(cmd);
 	}
-	cmd[n].path = ft_strjoin(tmp, cmd[n].cmd[0]);
-	if (!cmd[n].path)
+	if (cmd[n].cmd)
+		cmd[n].path = ft_strjoin(tmp, cmd[n].cmd[0]);
+	if (!cmd[n].path && cmd[n].cmd)
 	{
+		free(tmp);
 		free_paths(path);
 		fancy_exit(cmd);
 	}

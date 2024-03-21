@@ -6,7 +6,7 @@
 /*   By: pauberna <pauberna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/21 16:14:02 by pauberna          #+#    #+#             */
-/*   Updated: 2023/10/04 17:38:44 by pauberna         ###   ########.fr       */
+/*   Updated: 2024/03/21 14:31:33 by pauberna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void	ft_putendl_fd(char *s, int fd)
 	int	n;
 
 	n = 0;
-	while (s[n] != '\0')
+	while (s && s[n] != '\0')
 	{
 		write(fd, &s[n], 1);
 		n++;

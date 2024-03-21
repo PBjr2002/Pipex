@@ -6,7 +6,7 @@
 /*   By: pauberna <pauberna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 13:02:09 by pauberna          #+#    #+#             */
-/*   Updated: 2024/03/13 14:49:25 by pauberna         ###   ########.fr       */
+/*   Updated: 2024/03/21 14:37:25 by pauberna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,12 @@ void	close_fd(t_cmd *cmd, int limit)
 	n = 0;
 	while (n < limit)
 	{
-		close(cmd[n].fd[0]);
-		close(cmd[n].fd[1]);
+		if (cmd[n].fd[0] != -1 && cmd[n].fd[0] != STDIN_FILENO
+			&& cmd[n].fd[0] != STDOUT_FILENO && cmd[n].fd[0] != STDERR_FILENO)
+			close(cmd[n].fd[0]);
+		if (cmd[n].fd[1] != -1 && cmd[n].fd[1] != STDIN_FILENO
+			&& cmd[n].fd[1] != STDOUT_FILENO && cmd[n].fd[1] != STDERR_FILENO)
+			close(cmd[n].fd[1]);
 		n++;
 	}
 }
@@ -68,6 +72,8 @@ void	execute_fork(t_cmd *cmd, char **envp)
 				break ;
 			}
 		}
+		if ((!cmd[n].path || !cmd[n].path[0]) && cmd[n].cmd)
+			error_msg(cmd, NULL, n, 0);
 	}
 	close_fd(cmd, cmd[0].cmd_nb);
 }
@@ -80,18 +86,16 @@ void	open_pipe(t_cmd *cmd, char **av, int ac)
 	{
 		cmd[0].fd[0] = exe_here_doc(cmd);
 		cmd[0].fd[1] = open(av[ac - 1], O_CREAT | O_WRONLY | O_APPEND, 0644);
-		if (cmd[0].fd[1] == -1)
-			error_msg(cmd, 1);
 	}
 	else
 	{
 		cmd[0].fd[0] = open(av[1], O_RDONLY);
-		if (cmd[0].fd[0] == -1)
-			error_msg(cmd, 0);
 		cmd[0].fd[1] = open(av[ac - 1], O_CREAT | O_WRONLY | O_TRUNC, 0644);
-		if (cmd[0].fd[1] == -1)
-			error_msg(cmd, 1);
 	}
+	if (cmd[0].fd[1] == -1)
+		fancy_exit(cmd);
+	if (cmd[0].fd[0] == -1)
+		error_msg(cmd, av[1], 0, 2);
 	n = 1;
 	while (n < cmd[0].cmd_nb)
 	{
@@ -104,25 +108,16 @@ void	open_pipe(t_cmd *cmd, char **av, int ac)
 void	execute_cmd(t_cmd *cmd, char **envp, int n)
 {
 	if (dup2(cmd[n - 1].fd[0], STDIN_FILENO) == -1)
-	{
-		close_fd(cmd, cmd[0].cmd_nb);
-		fancy_exit(cmd);
-	}
+		error_msg(cmd, NULL, 0, 1);
 	if (n == cmd[0].cmd_nb)
 	{
 		if (dup2(cmd[0].fd[1], STDOUT_FILENO) == -1)
-		{
-			close_fd(cmd, cmd[0].cmd_nb);
-			fancy_exit(cmd);
-		}
+			error_msg(cmd, NULL, 0, 1);
 	}
 	else
 	{
 		if (dup2(cmd[n].fd[1], STDOUT_FILENO) == -1)
-		{
-			close_fd(cmd, cmd[0].cmd_nb);
-			fancy_exit(cmd);
-		}
+			error_msg(cmd, NULL, 0, 1);
 	}
 	close_fd(cmd, cmd[0].cmd_nb);
 	if (execve(cmd[n].path, cmd[n].cmd, envp) == -1)
