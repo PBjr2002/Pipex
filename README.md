@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-**Pipex** was a system programming project focused on recreating Unix shell pipeline functionality in C. The objective was to build a program that executes shell commands connected by pipes, handling input/output redirection between files and processes using low-level system calls.
+**Pipex** is a system programming project focused on recreating Unix shell pipeline functionality in C. The objective was to build a program that executes shell commands connected by pipes, handling input/output redirection between files and processes using low-level system calls.
 
 The project emphasized:
 - Creating child processes (`fork`) and managing them (`wait`, `waitpid`)
